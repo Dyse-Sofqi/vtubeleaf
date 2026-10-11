@@ -18,8 +18,8 @@
         "title": "VTubeLeaf",
         "width": 1280,
         "height": 720,
-        "minWidth": 900,
-        "minHeight": 650,
+        "minWidth": 1280,
+        "minHeight": 720,
         "backgroundThrottling": "disabled"
       }
     ],

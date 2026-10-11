@@ -5,6 +5,7 @@
 ### Improved
 
 - The release notes shown after an update now use a wider dialog, so longer entries are easier to read.
+- The main window can no longer be resized below 1280×720, leaving enough room for the stage and settings.
 
 ## v1.2.1 · 2026-10-11
 
