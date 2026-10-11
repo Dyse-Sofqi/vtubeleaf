@@ -81,6 +81,37 @@ test('face tracking uses the selected device and allows CPU retry after GPU star
   expect(result.restarted).toBe(true);
 });
 
+test('output aspect ratio outlines the chosen box on the stage and survives reload', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: '画面', exact: true }).click();
+  const aspect = page.getByRole('combobox', { name: '输出比例', exact: true });
+  await expect(aspect).toHaveText('默认（跟随窗口）');
+  const outline = () =>
+    page.evaluate(() => {
+      const style = getComputedStyle(document.querySelector('.stage-frame')!, '::after');
+      return style.display === 'none' ? 'hidden' : [style.width, style.height];
+    });
+  expect(await outline()).toEqual(['auto', 'auto']);
+  await chooseOption(page, aspect, '16:9');
+  await expect
+    .poll(() =>
+      page.evaluate(() => JSON.parse(localStorage.getItem('vtubeleaf-preview')!).outputAspect),
+    )
+    .toBe('16:9');
+  // The 1200×800 stage holds a centered 1200×675 box.
+  expect(await outline()).toEqual(['1200px', '675px']);
+  await page.screenshot({ path: testInfo.outputPath('output-aspect.png') });
+  await page.reload();
+  await page.getByRole('button', { name: '画面', exact: true }).click();
+  await expect(aspect).toHaveText('16:9');
+  await chooseOption(page, aspect, '9:16');
+  await expect.poll(outline).toEqual(['450px', '800px']);
+  await page.locator('#live-mode').click();
+  await expect.poll(outline).toBe('hidden');
+});
+
 test('keyboard hotkey switch persists and restores existing application bindings', async ({
   page,
 }) => {

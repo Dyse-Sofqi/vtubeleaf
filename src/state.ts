@@ -140,7 +140,24 @@ export type ModelProfile = {
   vtsImportReport: string[];
 };
 
+export type OutputAspect = 'auto' | '16:9' | '9:16' | '4:3' | '3:4';
+export const OUTPUT_ASPECTS: Exclude<OutputAspect, 'auto'>[] = ['16:9', '9:16', '4:3', '3:4'];
+export type Box = { x: number; y: number; width: number; height: number };
+
+/**
+ * The stage area that the virtual camera and OBS capture and that the avatar and props are laid
+ * out in: the whole stage, or the largest centered box of the chosen ratio.
+ */
+export function outputBox(width: number, height: number, aspect: OutputAspect): Box {
+  if (aspect === 'auto') return { x: 0, y: 0, width, height };
+  const [w, h] = aspect.split(':').map(Number);
+  const scale = Math.min(width / w, height / h);
+  const box = { width: w * scale, height: h * scale };
+  return { x: (width - box.width) / 2, y: (height - box.height) / 2, ...box };
+}
+
 export type Settings = ModelProfile & {
+  outputAspect: OutputAspect;
   // Applied at startup, so a change takes effect after a restart.
   language: 'system' | Lang;
   autoCheckUpdates: boolean;
@@ -196,6 +213,7 @@ export const NEUTRAL: Face = {
 };
 
 export const defaults: Settings = {
+  outputAspect: 'auto',
   language: 'system',
   autoCheckUpdates: true,
   skippedUpdateVersion: '',
@@ -554,6 +572,8 @@ export function readSettings(value: unknown): Settings {
   if (typeof v.autoStartMic === 'boolean') s.autoStartMic = v.autoStartMic;
   if (typeof v.virtualCameraMirror === 'boolean') s.virtualCameraMirror = v.virtualCameraMirror;
   if (v.obsOutput === 'browser') s.obsOutput = v.obsOutput;
+  if (OUTPUT_ASPECTS.includes(v.outputAspect as Exclude<OutputAspect, 'auto'>))
+    s.outputAspect = v.outputAspect as OutputAspect;
   if (typeof v.skippedUpdateVersion === 'string' && v.skippedUpdateVersion.length <= 128)
     s.skippedUpdateVersion = v.skippedUpdateVersion;
   if (typeof v.lastSeenVersion === 'string' && v.lastSeenVersion.length <= 128)

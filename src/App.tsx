@@ -40,6 +40,7 @@ import {
   defaultMapping,
   parameterNames,
   faceSources,
+  OUTPUT_ASPECTS,
   type Settings,
   type Mapping,
   type FaceKey,
@@ -255,12 +256,13 @@ export function App() {
       if (!studio.canMove()) return;
       event.preventDefault();
       const rect = element.getBoundingClientRect();
+      const box = studio.stageBox();
       const delta =
         event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? rect.height : 1);
       studio.actions.zoom(
         Math.exp(-delta * 0.0015),
-        (event.clientX - rect.left) / rect.width - 0.5,
-        (event.clientY - rect.top) / rect.height - 0.5,
+        (event.clientX - rect.left - box.x) / box.width - 0.5,
+        (event.clientY - rect.top - box.y) / box.height - 0.5,
       );
     };
     element.addEventListener('wheel', wheel, { passive: false });
@@ -468,7 +470,10 @@ export function App() {
           </span>
         </nav>
         <section className="workspace" aria-label={t('app.avatarPreview')}>
-          <div className="stage-frame">
+          <div
+            className="stage-frame"
+            data-output-aspect={s.outputAspect === 'auto' ? undefined : s.outputAspect}
+          >
             <div
               id="stage"
               ref={container}
@@ -484,11 +489,12 @@ export function App() {
               onPointerMove={(event) => {
                 const previous = drag.current;
                 if (!previous || previous.id !== event.pointerId) return;
-                const rect = event.currentTarget.getBoundingClientRect();
-                a?.pan(
-                  (event.clientX - previous.x) / rect.width,
-                  (event.clientY - previous.y) / rect.height,
-                );
+                const box = runtime.current?.stageBox();
+                if (box)
+                  a?.pan(
+                    (event.clientX - previous.x) / box.width,
+                    (event.clientY - previous.y) / box.height,
+                  );
                 drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
               }}
               onPointerUp={(event) => {
@@ -1344,6 +1350,26 @@ export function App() {
                   onChange={(value) => set('modelVisible', value)}
                 />
                 <p className="hint">{t('app.layoutHint')}</p>
+                <label htmlFor="output-aspect">{t('app.outputAspect')}</label>
+                <Select
+                  value={s.outputAspect}
+                  onValueChange={(value) =>
+                    value && set('outputAspect', value as Settings['outputAspect'])
+                  }
+                >
+                  <SelectTrigger id="output-aspect">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">{t('app.outputAspectAuto')}</SelectItem>
+                    {OUTPUT_ASPECTS.map((aspect) => (
+                      <SelectItem key={aspect} value={aspect}>
+                        {aspect}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="hint">{t('app.outputAspectHint')}</p>
                 <Fold title={t('app.layoutValues')}>
                   {range('zoom', t('app.modelZoom'), 0.05, 10, 0.05)}
                   {range('x', t('app.horizontalPosition'), -0.8, 0.8, 0.01)}

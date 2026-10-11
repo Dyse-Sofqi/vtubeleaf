@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { install } from '@pixi/unsafe-eval';
 import { invoke } from '@tauri-apps/api/core';
 import type { Live2DModel, Cubism4InternalModel } from 'pixi-live2d-display/cubism4';
-import { clamp, describeParameters, type Parameter, type Settings } from './state';
+import { clamp, describeParameters, outputBox, type Parameter, type Settings } from './state';
 import { SceneLayers, type SceneFrames } from './scene-renderer';
 import { physicsGroupsFromJson, wrapPhysics, type PhysicsGroup } from './physics';
 import { layoutMasks, maskBufferSize } from './masks';
@@ -588,8 +588,14 @@ export class AvatarStage {
     return this.app.view;
   }
 
+  /** The stage area that outputs capture, in screen coordinates. */
+  private outputBox() {
+    const { width, height } = this.app.screen;
+    return outputBox(width, height, this.settings?.outputAspect ?? 'auto');
+  }
+
   /**
-   * Renders the stage letterboxed into a width×height texture, at 2x and box-downsampled when
+   * Renders the output box letterboxed into a width×height texture, at 2x and box-downsampled when
    * `supersampled`. Without a background the scene's background layer is hidden and the frame
    * stays transparent; with one (premultiplied RGBA), the whole frame is filled with it first and
    * optionally mirrored.
@@ -620,14 +626,14 @@ export class AvatarStage {
       target.texture?.destroy(true);
       target.texture = PIXI.RenderTexture.create({ width, height, resolution });
     }
-    // Render into the letterboxed area only, so its viewport crops overflow like the preview does.
-    const screen = this.app.screen;
-    const scale = Math.min(width / screen.width, height / screen.height);
+    // Render into the letterboxed area only, so its viewport crops overflow at the box edges.
+    const box = this.outputBox();
+    const scale = Math.min(width / box.width, height / box.height);
     const frame = new PIXI.Rectangle(
       0,
       0,
-      Math.round(screen.width * scale),
-      Math.round(screen.height * scale),
+      Math.round(box.width * scale),
+      Math.round(box.height * scale),
     );
     frame.x = Math.round((width - frame.width) / 2);
     frame.y = Math.round((height - frame.height) / 2);
@@ -647,12 +653,9 @@ export class AvatarStage {
         frame,
       );
     }
-    const transform = new PIXI.Matrix(
-      frame.width / screen.width,
-      0,
-      0,
-      frame.height / screen.height,
-    );
+    const sx = frame.width / box.width,
+      sy = frame.height / box.height;
+    const transform = new PIXI.Matrix(sx, 0, 0, sy, -box.x * sx, -box.y * sy);
     const layer = background ? undefined : this.layers?.background;
     const visible = layer?.visible;
     try {
@@ -847,14 +850,15 @@ export class AvatarStage {
     const model = this.model,
       s = this.settings;
     model.visible = s.modelVisible;
+    const box = outputBox(width, height, s.outputAspect);
     this.modelScale =
-      Math.min(width / model.internalModel.width, height / model.internalModel.height) *
+      Math.min(box.width / model.internalModel.width, box.height / model.internalModel.height) *
       0.92 *
       s.zoom;
     model.anchor.set(0.5);
     model.rotation = (s.rotation * Math.PI) / 180;
     model.scale.set(this.modelScale * this.depthScale);
-    model.position.set(width * (0.5 + s.x), height * (0.5 + s.y));
+    model.position.set(box.x + box.width * (0.5 + s.x), box.y + box.height * (0.5 + s.y));
   }
 
   playMotion(id: string, mode: MotionMode = 'once', idle = false) {

@@ -261,6 +261,10 @@ export default {
   'app.resetLayout': '复位',
   'app.showMainModel': '显示主角色',
   'app.layoutHint': '在舞台上拖动移动、滚轮缩放。',
+  'app.outputAspect': '输出比例',
+  'app.outputAspectAuto': '默认（跟随窗口）',
+  'app.outputAspectHint':
+    '选择比例后，舞台上的框就是虚拟摄像头和 OBS 收到的范围；默认按整个窗口输出。',
   'app.layoutValues': '构图数值',
   'app.modelZoom': '角色缩放',
   'app.horizontalPosition': '水平位置',

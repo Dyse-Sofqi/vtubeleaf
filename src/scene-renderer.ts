@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { invoke } from '@tauri-apps/api/core';
 import { parseGIF, decompressFrames } from 'gifuct-js';
 import { builtinBackgrounds, type SceneItem, type Composition } from './scenes';
-import type { Settings } from './state';
+import { outputBox, type Settings } from './state';
 import type { AvatarStage, ModelInfo } from './renderer';
 import { t } from './i18n';
 
@@ -230,6 +230,8 @@ export class SceneLayers {
     frames?: SceneFrames,
     depthScale = 1,
   ) {
+    // The background covers the whole stage; props share the avatar's output box.
+    const box = outputBox(width, height, s.outputAspect);
     for (const visual of this.visuals) {
       const item = visual.item && s.composition.items.find((i) => i.id === visual.item!.id);
       const node = visual.node;
@@ -252,13 +254,21 @@ export class SceneLayers {
         const attached = item.attach === 'model';
         const angle = attached ? (s.rotation * Math.PI) / 180 : 0;
         const zoom = attached ? s.zoom * depthScale : 1;
-        const x = item.x * width * zoom,
-          y = item.y * height * zoom;
+        const x = item.x * box.width * zoom,
+          y = item.y * box.height * zoom;
         node.position.set(
-          width * (0.5 + (attached ? s.x : 0)) + x * Math.cos(angle) - y * Math.sin(angle),
-          height * (0.5 + (attached ? s.y : 0)) + x * Math.sin(angle) + y * Math.cos(angle),
+          box.x +
+            box.width * (0.5 + (attached ? s.x : 0)) +
+            x * Math.cos(angle) -
+            y * Math.sin(angle),
+          box.y +
+            box.height * (0.5 + (attached ? s.y : 0)) +
+            x * Math.sin(angle) +
+            y * Math.cos(angle),
         );
-        node.scale.set(Math.min(width / visual.width, height / visual.height) * item.scale * zoom);
+        node.scale.set(
+          Math.min(box.width / visual.width, box.height / visual.height) * item.scale * zoom,
+        );
         node.rotation = (item.rotation * Math.PI) / 180 + angle;
       }
       if (node.visible)

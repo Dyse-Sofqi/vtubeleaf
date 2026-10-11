@@ -271,6 +271,10 @@ export default {
   'app.resetLayout': 'Restablecer',
   'app.showMainModel': 'Mostrar avatar principal',
   'app.layoutHint': 'Arrastra en el escenario para mover y usa la rueda para hacer zoom.',
+  'app.outputAspect': 'Relación de aspecto de la salida',
+  'app.outputAspectAuto': 'Predeterminado (seguir la ventana)',
+  'app.outputAspectHint':
+    'Al elegir una relación, el área enmarcada en el escenario es lo que reciben la cámara virtual y OBS; por defecto se envía toda la ventana.',
   'app.layoutValues': 'Valores de composición',
   'app.modelZoom': 'Escala del avatar',
   'app.horizontalPosition': 'Posición horizontal',

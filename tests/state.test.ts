@@ -997,3 +997,18 @@ test('UI language keeps a supported choice and otherwise follows the system', ()
   for (const language of ['de', 'zh-CN', 'system', 1, null])
     assert.equal(readSettings({ language }).language, 'system');
 });
+
+test('output aspect defaults to the window and keeps only a listed ratio', () => {
+  for (const outputAspect of [undefined, null, '', 'auto', '21:9', 1])
+    assert.equal(readSettings({ outputAspect }).outputAspect, 'auto');
+  for (const outputAspect of ['16:9', '9:16', '4:3', '3:4'])
+    assert.equal(readSettings({ outputAspect }).outputAspect, outputAspect);
+  assert.deepEqual(state.outputBox(500, 500, 'auto'), { x: 0, y: 0, width: 500, height: 500 });
+  assert.deepEqual(state.outputBox(500, 500, '16:9'), {
+    x: 0,
+    y: 109.375,
+    width: 500,
+    height: 281.25,
+  });
+  assert.deepEqual(state.outputBox(1280, 720, '9:16'), { x: 437.5, y: 0, width: 405, height: 720 });
+});

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- "Appearance" adds "Output aspect ratio": pick 16:9, 9:16, 4:3 or 3:4 and an outline on the stage marks exactly what the virtual camera and OBS receive, so the shape of the window no longer decides how the output is framed. "Default (follow window)" keeps the previous behavior.
+
 ### Improved
 
 - The release notes shown after an update now use a wider dialog, so longer entries are easier to read.

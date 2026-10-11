@@ -272,6 +272,10 @@ export default {
   'app.resetLayout': 'Réinitialiser',
   'app.showMainModel': 'Afficher l’avatar principal',
   'app.layoutHint': 'Glissez sur la scène pour déplacer, molette pour zoomer.',
+  'app.outputAspect': 'Format de la sortie',
+  'app.outputAspectAuto': 'Par défaut (suivre la fenêtre)',
+  'app.outputAspectHint':
+    'Avec un format choisi, la zone encadrée sur la scène est ce que reçoivent la caméra virtuelle et OBS ; par défaut, toute la fenêtre est envoyée.',
   'app.layoutValues': 'Valeurs de cadrage',
   'app.modelZoom': 'Échelle de l’avatar',
   'app.horizontalPosition': 'Position horizontale',

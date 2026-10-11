@@ -271,6 +271,10 @@ export default {
   'app.resetLayout': 'リセット',
   'app.showMainModel': 'メインキャラクターを表示',
   'app.layoutHint': 'ステージ上でドラッグして移動、ホイールで拡大縮小。',
+  'app.outputAspect': '出力のアスペクト比',
+  'app.outputAspectAuto': 'デフォルト（ウィンドウに合わせる）',
+  'app.outputAspectHint':
+    '比率を選ぶと、ステージ上の枠内が仮想カメラと OBS に送られる範囲になります。デフォルトではウィンドウ全体を出力します。',
   'app.layoutValues': '構図の数値',
   'app.modelZoom': 'キャラクターの拡大率',
   'app.horizontalPosition': '水平位置',

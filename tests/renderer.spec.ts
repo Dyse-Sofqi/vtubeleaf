@@ -284,6 +284,85 @@ test('virtual camera frames include the scene, fill the letterbox, mirror and ke
   expect(result.unchanged).toBe(true);
 });
 
+test('a chosen output ratio frames the camera from the centered box and keeps the preview background whole', async ({
+  page,
+}, testInfo) => {
+  await loadControls(page);
+  const result = await page.evaluate(async () => {
+    const { stage, settings, info } = (window as any).rendererControls;
+    const { readSettings } = await import('/src/state.ts');
+    const { mockIPC } = await import('/node_modules/@tauri-apps/api/mocks.js');
+    const asset = document.createElement('canvas');
+    asset.width = asset.height = 64;
+    const ctx = asset.getContext('2d')!;
+    ctx.fillStyle = '#00ff00';
+    ctx.fillRect(0, 0, 64, 64);
+    const green = await new Promise<Blob>((resolve) => asset.toBlob((blob) => resolve(blob!)));
+    mockIPC(async (cmd: string, args: { resource: string }) => {
+      if (cmd === 'read_asset') return green.arrayBuffer();
+      if (cmd === 'read_model_resource')
+        return (await fetch('/renderer-controls/' + encodeURI(args.resource))).arrayBuffer();
+    });
+    const at = (bytes: Uint8ClampedArray | Uint8Array, x: number, y: number, width = 1280) =>
+      Array.from(bytes.slice((y * width + x) * 4, (y * width + x) * 4 + 4));
+    const wide = readSettings({
+      ...settings,
+      outputAspect: '16:9',
+      composition: { backgroundImage: '0123456789abcdef0123456789abcdef.png', items: [] },
+    });
+    await stage.compose(wide, [info]);
+    stage.draw({ ParamAngleX: 12 }, 16);
+    // The 500×500 stage holds a 500×281 box; the frame shows that box alone, scene included.
+    const frame = stage.cameraPixels(1280, 720, '#123456', false).slice();
+    let model = 0;
+    for (let i = 0; i < frame.length; i += 4) if (frame[i] > 8 || frame[i + 2] > 8) model++;
+    // The preview still draws the scene background over the whole square, outside the box too.
+    const preview = document.createElement('canvas');
+    preview.width = preview.height = 500;
+    preview.getContext('2d')!.drawImage(stage.canvas, 0, 0, 500, 500);
+    const previewPixels = preview.getContext('2d')!.getImageData(0, 0, 500, 500).data;
+    // A portrait box sits in the middle of the landscape frame over the camera background.
+    stage.display(readSettings({ ...wide, outputAspect: '9:16' }));
+    stage.draw({ ParamAngleX: 12 }, 16);
+    const portrait = stage.cameraPixels(1280, 720, '#123456', false).slice();
+    const image = document.createElement('canvas');
+    image.width = 1280;
+    image.height = 720;
+    image
+      .getContext('2d')!
+      .putImageData(new ImageData(new Uint8ClampedArray(portrait), 1280, 720), 0, 0);
+    return {
+      corners: [at(frame, 5, 5), at(frame, 1275, 715)],
+      model,
+      previewCorners: [at(previewPixels, 5, 5, 500), at(previewPixels, 5, 495, 500)],
+      bars: [at(portrait, 5, 5), at(portrait, 1275, 715)],
+      inside: [at(portrait, 640, 5), at(portrait, 440, 715)],
+      image: image.toDataURL(),
+    };
+  });
+  writeFileSync(
+    testInfo.outputPath('camera-portrait.png'),
+    Buffer.from(result.image.split(',')[1], 'base64'),
+  );
+  expect(result.corners).toEqual([
+    [0, 255, 0, 255],
+    [0, 255, 0, 255],
+  ]);
+  expect(result.model).toBeGreaterThan(10000);
+  expect(result.previewCorners).toEqual([
+    [0, 255, 0, 255],
+    [0, 255, 0, 255],
+  ]);
+  expect(result.bars).toEqual([
+    [18, 52, 86, 255],
+    [18, 52, 86, 255],
+  ]);
+  expect(result.inside).toEqual([
+    [0, 255, 0, 255],
+    [0, 255, 0, 255],
+  ]);
+});
+
 test('virtual camera skips frames while the stage has no size or the GPU context is lost', async ({
   page,
 }) => {

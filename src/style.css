@@ -476,6 +476,35 @@ body.about {
 .stage-frame {
   overflow: hidden;
   background: #e5ebdd;
+  container-type: size;
+}
+/* Outline of the output box: what the virtual camera and OBS receive once a ratio is chosen. */
+.stage-frame[data-output-aspect]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(100cqw, calc(100cqh * var(--output-aspect)));
+  height: min(100cqh, calc(100cqw / var(--output-aspect)));
+  box-shadow:
+    0 0 0 1px #ffffffb3,
+    0 0 0 2px #00000040;
+  pointer-events: none;
+}
+.stage-frame[data-output-aspect='16:9'] {
+  --output-aspect: calc(16 / 9);
+}
+.stage-frame[data-output-aspect='9:16'] {
+  --output-aspect: calc(9 / 16);
+}
+.stage-frame[data-output-aspect='4:3'] {
+  --output-aspect: calc(4 / 3);
+}
+.stage-frame[data-output-aspect='3:4'] {
+  --output-aspect: calc(3 / 4);
+}
+.live-mode .stage-frame::after {
+  display: none;
 }
 .stage-frame #stage {
   position: absolute;

@@ -271,6 +271,10 @@ export default {
   'app.resetLayout': 'Reset',
   'app.showMainModel': 'Show main avatar',
   'app.layoutHint': 'Drag on the stage to move; scroll to zoom.',
+  'app.outputAspect': 'Output aspect ratio',
+  'app.outputAspectAuto': 'Default (follow window)',
+  'app.outputAspectHint':
+    'With a ratio chosen, the outlined area on the stage is what the virtual camera and OBS receive; by default the whole window is sent.',
   'app.layoutValues': 'Layout values',
   'app.modelZoom': 'Avatar scale',
   'app.horizontalPosition': 'Horizontal position',

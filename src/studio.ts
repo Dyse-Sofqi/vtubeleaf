@@ -19,6 +19,7 @@ import {
   type Mapping,
   type HotkeyOptions,
   clamp,
+  outputBox,
   type Face,
   type Settings,
   type ModelProfile,
@@ -1198,7 +1199,7 @@ export function createStudio(
       const item = settings.composition.items.find((i) => i.id === selectedItem);
       if (item) {
         if (item.attach === 'model') {
-          const { width, height } = container.getBoundingClientRect();
+          const { width, height } = stageBox();
           if (!width || !height) return;
           const angle = (settings.rotation * Math.PI) / 180;
           const x = dx * width,
@@ -1715,9 +1716,15 @@ export function createStudio(
     true,
     () => !document.hidden || needsFrames(),
   );
+  /** The output box in stage CSS pixels; drag and wheel offsets are fractions of it. */
+  function stageBox() {
+    const { width, height } = container.getBoundingClientRect();
+    return outputBox(width, height, settings.outputAspect);
+  }
   return {
     actions,
     snapshot,
+    stageBox,
     micLevel: {
       get: () => micLevel,
       subscribe(listener: () => void) {
