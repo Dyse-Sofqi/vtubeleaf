@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Improved
+
+- The release notes shown after an update now use a wider dialog, so longer entries are easier to read.
+
 ## v1.2.1 · 2026-10-11
 
 ### Improved

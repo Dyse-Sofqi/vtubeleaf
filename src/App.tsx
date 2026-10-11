@@ -1694,7 +1694,7 @@ export function App() {
       >
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-40 bg-black/30" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100%_-_2rem)] w-[calc(100%_-_2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col rounded-2xl border bg-background p-6 shadow-lg">
+          <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100%_-_2rem)] w-[calc(100%_-_2rem)] max-w-2xl -translate-x-1/2 -translate-y-1/2 flex-col rounded-2xl border bg-background p-6 shadow-lg">
             <Dialog.Title className="text-lg font-medium">
               {t('app.updatedTo', { version })}
             </Dialog.Title>
