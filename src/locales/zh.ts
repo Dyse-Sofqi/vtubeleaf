@@ -281,11 +281,8 @@ export default {
     '卸载后，其他软件将无法使用 VTubeLeaf Camera，需要重新安装才能恢复。',
   'app.confirmUninstall': '确认卸载',
   'app.autoStartVirtualCamera': '开始跟踪时自动输出',
-  'app.moreOutputOptions': '更多输出选项',
   'app.autoStopVirtualCamera': '停止跟踪时自动停止输出',
   'app.mirrorOutput': '镜像输出',
-  'app.virtualCameraHint':
-    'Windows 安装到当前用户；macOS 首次安装需按系统提示允许摄像头扩展。启动后，在直播或视频软件中选择 VTubeLeaf Camera。只输出角色、道具和背景；麦克风在所用软件中单独选择。',
   'app.obsTransparentOutput': 'OBS 透明输出',
   'app.obsBrowserSpec': 'Alpha · 1280×720 · 最高 30 FPS',
   'app.switching': '切换中…',

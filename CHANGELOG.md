@@ -10,6 +10,7 @@
 
 - The release notes shown after an update now use a wider dialog, so longer entries are easier to read.
 - The main window can no longer be resized below 1280×720, leaving enough room for the stage and settings.
+- "Stop output when tracking stops" and "Mirror output" are now shown directly under "Built-in virtual camera", with the extra options heading and setup note removed.
 
 ## v1.2.1 · 2026-10-11
 

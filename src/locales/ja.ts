@@ -291,11 +291,8 @@ export default {
     'アンインストールすると、他のソフトで VTubeLeaf Camera を使えなくなります。復元するには再インストールが必要です。',
   'app.confirmUninstall': 'アンインストールする',
   'app.autoStartVirtualCamera': 'トラッキング開始時に自動で出力',
-  'app.moreOutputOptions': 'その他の出力オプション',
   'app.autoStopVirtualCamera': 'トラッキング停止時に出力も停止',
   'app.mirrorOutput': '出力を反転',
-  'app.virtualCameraHint':
-    'Windows では現在のユーザーにインストールされます。macOS では初回インストール時にシステムの案内に従ってカメラ拡張機能を許可してください。起動後、配信・ビデオソフトで VTubeLeaf Camera を選択します。出力されるのはキャラクター・アイテム・背景のみで、マイクは使用するソフト側で別途選択します。',
   'app.obsTransparentOutput': 'OBS 透過出力',
   'app.obsBrowserSpec': 'Alpha · 1280×720 · 最大 30 FPS',
   'app.switching': '切り替え中…',

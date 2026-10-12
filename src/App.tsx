@@ -1504,15 +1504,8 @@ export function App() {
                   t('app.autoStartVirtualCamera'),
                   !camera.installed,
                 )}
-                <Fold title={t('app.moreOutputOptions')}>
-                  {toggle(
-                    'autoStopVirtualCamera',
-                    t('app.autoStopVirtualCamera'),
-                    !camera.installed,
-                  )}
-                  {toggle('virtualCameraMirror', t('app.mirrorOutput'), !camera.installed)}
-                  <p className="hint">{t('app.virtualCameraHint')}</p>
-                </Fold>
+                {toggle('autoStopVirtualCamera', t('app.autoStopVirtualCamera'), !camera.installed)}
+                {toggle('virtualCameraMirror', t('app.mirrorOutput'), !camera.installed)}
               </Tabs.Content>
               <Tabs.Content value="obs">
                 <div className="section-title">

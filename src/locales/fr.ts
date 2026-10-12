@@ -292,11 +292,8 @@ export default {
     'Les autres applis ne pourront plus utiliser VTubeLeaf Camera tant que vous ne l’aurez pas réinstallée.',
   'app.confirmUninstall': 'Désinstaller',
   'app.autoStartVirtualCamera': 'Diffuser au démarrage du suivi',
-  'app.moreOutputOptions': 'Autres options de sortie',
   'app.autoStopVirtualCamera': 'Arrêter la diffusion à l’arrêt du suivi',
   'app.mirrorOutput': 'Inverser la sortie',
-  'app.virtualCameraHint':
-    'Sous Windows, l’installation se fait pour l’utilisateur actuel ; sous macOS, autorisez l’extension de caméra à la première installation. Ensuite, choisissez VTubeLeaf Camera dans votre appli de streaming ou de visio. Seuls l’avatar, les accessoires et l’arrière-plan sont diffusés ; le microphone se choisit séparément dans cette appli.',
   'app.obsTransparentOutput': 'Sortie transparente OBS',
   'app.obsBrowserSpec': 'Alpha · 1280×720 · 30 FPS max',
   'app.switching': 'Changement…',

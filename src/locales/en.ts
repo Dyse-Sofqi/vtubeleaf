@@ -291,11 +291,8 @@ export default {
     'Other apps will no longer be able to use VTubeLeaf Camera until you reinstall it.',
   'app.confirmUninstall': 'Uninstall',
   'app.autoStartVirtualCamera': 'Start output when tracking starts',
-  'app.moreOutputOptions': 'More output options',
   'app.autoStopVirtualCamera': 'Stop output when tracking stops',
   'app.mirrorOutput': 'Mirror output',
-  'app.virtualCameraHint':
-    'On Windows it installs for the current user; on macOS, allow the camera extension when prompted on first install. Once started, choose VTubeLeaf Camera in your streaming or video app. Only the avatar, props and background are output; pick your microphone separately in that app.',
   'app.obsTransparentOutput': 'OBS transparent output',
   'app.obsBrowserSpec': 'Alpha · 1280×720 · up to 30 FPS',
   'app.switching': 'Switching…',
