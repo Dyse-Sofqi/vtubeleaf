@@ -143,7 +143,9 @@ export class ObsOutput {
             cache: 'no-store',
           });
           if (!response.ok) throw new Error(await response.text());
-          this.wanted = true;
+          // Syphon reports whether a client is attached; keeping that avoids rendering frames
+          // nobody reads on macOS.
+          this.wanted = ((await response.json()) as { wanted: boolean }).wanted;
         } catch {
           // Fall back to IPC so a server that failed to bind cannot stop the output outright.
           this.wanted = await invoke<boolean>('texture_submit', pixels);

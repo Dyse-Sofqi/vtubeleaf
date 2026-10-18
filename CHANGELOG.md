@@ -6,7 +6,7 @@
 
 - "Tracking engine" adds "Phone companion · Same Wi-Fi": after "Start tracking", a QR code appears; scan it with the VTubeLeaf phone app and the phone tracks your face and sends only motion values to the computer, so the computer no longer runs face tracking itself. The panel shows the connected phone, its engine, received frame rate and network round trip, and "Disconnect phone" ends that phone's session and shows a fresh code. Only one phone can be paired at a time; a second phone is told the computer is busy. A phone that drops off the network can come back within 30 seconds without scanning again, and connecting a different phone or engine asks you to calibrate your neutral pose again.
 - "OBS" adds "Pause preview while outputting": while OBS is connected the main window stops drawing the model, which skips the largest redraw of every frame. The stage goes blank until you turn it off.
-- "OBS" adds "OBS output size": pick 1920×1080 or 1280×720. 720p sends 44% less data to OBS every frame, which shortens the delay between your movement and the picture in OBS.
+- "OBS" adds "OBS output size": pick 1920×1080 or 1280×720. 720p sends 56% less data to OBS every frame, which shortens the delay between your movement and the picture in OBS.
 - "Appearance" adds "Output aspect ratio": pick 16:9, 9:16, 4:3 or 3:4 and an outline on the stage marks exactly what the virtual camera and OBS receive, so the shape of the window no longer decides how the output is framed. "Default (follow window)" keeps the previous behavior.
 
 ### Improved

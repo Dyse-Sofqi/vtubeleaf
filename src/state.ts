@@ -168,7 +168,7 @@ export type Settings = ModelProfile & {
   autoStartMic: boolean;
   virtualCameraMirror: boolean;
   obsOutput: 'native' | 'browser';
-  /** Frame size sent to OBS; 720p moves 44% less data across the IPC boundary every frame. */
+  /** Frame size sent to OBS; 720p moves 56% less data every frame. */
   obsOutputSize: '1080p' | '720p';
   /** Skips the preview redraw while OBS is connected; the stage goes blank to save the cost. */
   pausePreview: boolean;

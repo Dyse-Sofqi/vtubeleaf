@@ -134,10 +134,11 @@ pub fn texture_start(
         .map_err(|_| locale::text(OUTPUT_UNAVAILABLE))?
         .start()?;
     // The same local server accepts native frames over `POST /frame`, which avoids the Tauri IPC
-    // channel's ~96 ms fixed round trip.
-    obs.lock()
-        .map_err(|_| locale::text(OUTPUT_UNAVAILABLE))?
-        .serve(Arc::clone(output.inner()))?;
+    // channel's ~96 ms fixed round trip. A busy port must not fail the start: the front end falls
+    // back to IPC on its own, and native output worked without this port before.
+    if let Ok(mut obs) = obs.lock() {
+        let _ = obs.serve(Arc::clone(output.inner()));
+    }
     Ok(crate::obs::URL.to_owned())
 }
 

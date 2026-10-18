@@ -920,6 +920,8 @@ export function createStudio(
         stage.destroy();
         stage = candidate;
         candidate = undefined;
+        // The new stage has already painted, so a pending blanking no longer applies.
+        previewPaused = false;
         model = nextModel;
         modelRevision++;
         profileRevision++;
@@ -1718,6 +1720,8 @@ export function createStudio(
             stage.present();
           }
         } catch (error) {
+          // The output renderers draw the same stage, so a preview failure means the frames would
+          // fail too. Retrying every tick would also stop the camera, which must stay up.
           failedRevision = modelRevision;
           report(
             error instanceof Error ? t('studio.renderFailed', { error: error.message }) : error,

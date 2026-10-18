@@ -797,7 +797,7 @@ pub fn run() {
                 }
             }
             // Quitting from the menu skips the window close handler that normally stops the output.
-            if let Some(output) = app.try_state::<Mutex<texture::Output>>() {
+            if let Some(output) = app.try_state::<std::sync::Arc<Mutex<texture::Output>>>() {
                 if let Ok(mut output) = output.lock() {
                     output.stop();
                 }

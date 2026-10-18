@@ -1,6 +1,6 @@
 use crate::locale;
 use crate::texture;
-use http_body_util::{BodyExt, Full};
+use http_body_util::{BodyExt, Full, Limited};
 use hyper::{body::Bytes, server::conn::http1, service::service_fn, Request, Response, StatusCode};
 use hyper_util::rt::{TokioIo, TokioTimer};
 use std::{
@@ -182,7 +182,7 @@ async fn respond<B>(
 ) -> Response<Full<Bytes>>
 where
     B: hyper::body::Body,
-    B::Error: std::fmt::Debug,
+    B::Error: std::error::Error + Send + Sync + 'static,
 {
     let header = |name| {
         request
@@ -211,12 +211,21 @@ where
         // A binary POST is not a simple request, so the browser sends a preflight first.
         (StatusCode::NO_CONTENT, "text/plain", Bytes::new())
     } else if method == hyper::Method::POST && path == "/frame" {
-        let Ok(body) = request.into_body().collect().await else {
-            return reply(StatusCode::BAD_REQUEST, "text/plain", Bytes::new());
+        // A 1080p RGBA frame is 8.3 MB. Capping the stream keeps a local process from making the
+        // server buffer an unbounded body; `max_buf_size` only bounds hyper's read buffer.
+        const MAX_FRAME: usize = 16 * 1024 * 1024;
+        let Ok(body) = Limited::new(request.into_body(), MAX_FRAME).collect().await else {
+            return reply(StatusCode::PAYLOAD_TOO_LARGE, "text/plain", Bytes::new());
         };
         match texture.lock() {
             Ok(output) => match output.submit(&body.to_bytes()) {
-                Ok(_) => (StatusCode::NO_CONTENT, "text/plain", Bytes::new()),
+                // The reply carries `wanted` so the front end keeps the receiver-aware polling it
+                // had over IPC (Syphon reports whether a client is attached).
+                Ok(wanted) => (
+                    StatusCode::OK,
+                    "application/json",
+                    Bytes::from(format!("{{\"wanted\":{wanted}}}")),
+                ),
                 Err(error) => (StatusCode::BAD_REQUEST, "text/plain", Bytes::from(error)),
             },
             Err(_) => (
