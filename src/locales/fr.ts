@@ -332,6 +332,8 @@ export default {
   'app.obsNativeSelect': 'Choisissez VTubeLeaf dans une source « {source} » d’OBS',
   'app.obsBrowserPaste': 'Collez l’adresse dans une source « Navigateur » d’OBS',
   'app.outputMethod': 'Méthode de sortie',
+  'app.obsOutputSize': 'Taille de sortie OBS',
+  'app.pausePreview': 'Suspendre l’aperçu pendant la sortie',
   'app.browserSource': 'Source navigateur',
   'app.obsBrowserUrl': 'Adresse de la source navigateur OBS',
   'app.copyAddress': 'Copier l’adresse',
@@ -832,6 +834,8 @@ export default {
   'studio.phoneLeft':
     'Le téléphone s’est déconnecté. Scannez le nouveau code pour l’appairer à nouveau.',
   'studio.renderStatus': '{render} FPS rendu · {input} FPS entrée · {inference} ms inférence',
+  'studio.renderStatusOutput':
+    '{render} FPS rendu · {input} FPS entrée · {inference} ms inférence · sortie {capture} + {transfer} ms · inactif {ping} · HTTP {http} ms',
   'studio.faceDetected': 'Visage détecté',
   'studio.faceLostHold': 'Aucun visage · pose maintenue',
   'studio.faceLostNeutral': 'Aucun visage · attente / retour neutre',

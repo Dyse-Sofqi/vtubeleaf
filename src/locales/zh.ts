@@ -319,6 +319,8 @@ export default {
   'app.obsNativeSelect': '在 OBS 的「{source}」来源中选择 VTubeLeaf',
   'app.obsBrowserPaste': '把地址粘贴到 OBS「浏览器」来源',
   'app.outputMethod': '输出方式',
+  'app.obsOutputSize': 'OBS 输出尺寸',
+  'app.pausePreview': '输出时暂停预览',
   'app.browserSource': '浏览器源',
   'app.obsBrowserUrl': 'OBS 浏览器源地址',
   'app.copyAddress': '复制地址',
@@ -720,6 +722,8 @@ export default {
   'studio.phoneLost': '与 {device} 的连接已中断，正在等待重连…',
   'studio.phoneLeft': '手机已断开连接，扫描新的二维码即可重新配对。',
   'studio.renderStatus': '{render} FPS 渲染 · {input} FPS 输入 · {inference} ms 推理',
+  'studio.renderStatusOutput':
+    '{render} FPS 渲染 · {input} FPS 输入 · {inference} ms 推理 · 输出 {capture} + {transfer} ms · 空载 {ping} · HTTP {http} ms',
   'studio.faceDetected': '已识别人脸',
   'studio.faceLostHold': '未识别人脸 · 保持姿态',
   'studio.faceLostNeutral': '未识别人脸 · 等待 / 回中立',

@@ -331,6 +331,8 @@ export default {
   'app.obsNativeSelect': 'OBS の「{source}」ソースで VTubeLeaf を選択',
   'app.obsBrowserPaste': 'アドレスを OBS の「ブラウザ」ソースに貼り付け',
   'app.outputMethod': '出力方式',
+  'app.obsOutputSize': 'OBS 出力サイズ',
+  'app.pausePreview': '出力中はプレビューを停止',
   'app.browserSource': 'ブラウザソース',
   'app.obsBrowserUrl': 'OBS ブラウザソースのアドレス',
   'app.copyAddress': 'アドレスをコピー',
@@ -826,6 +828,8 @@ export default {
   'studio.phoneLeft':
     'スマートフォンが切断しました。新しい QR コードをスキャンすると再度ペアリングできます。',
   'studio.renderStatus': '描画 {render} FPS · 入力 {input} FPS · 推論 {inference} ms',
+  'studio.renderStatusOutput':
+    '描画 {render} FPS · 入力 {input} FPS · 推論 {inference} ms · 出力 {capture} + {transfer} ms · 待機 {ping} · HTTP {http} ms',
   'studio.faceDetected': '顔を認識中',
   'studio.faceLostHold': '顔未検出 · 姿勢を保持',
   'studio.faceLostNeutral': '顔未検出 · 待機 / ニュートラルへ',

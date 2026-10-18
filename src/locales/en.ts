@@ -330,6 +330,8 @@ export default {
   'app.obsNativeSelect': 'Select VTubeLeaf in an OBS “{source}” source',
   'app.obsBrowserPaste': 'Paste the address into an OBS “Browser” source',
   'app.outputMethod': 'Output method',
+  'app.obsOutputSize': 'OBS output size',
+  'app.pausePreview': 'Pause preview while outputting',
   'app.browserSource': 'Browser source',
   'app.obsBrowserUrl': 'OBS browser source address',
   'app.copyAddress': 'Copy address',
@@ -804,6 +806,8 @@ export default {
   'studio.phoneLost': 'Lost the connection to {device}. Waiting for it to reconnect…',
   'studio.phoneLeft': 'The phone disconnected. Scan the new code to pair again.',
   'studio.renderStatus': '{render} FPS render · {input} FPS input · {inference} ms inference',
+  'studio.renderStatusOutput':
+    '{render} FPS render · {input} FPS input · {inference} ms inference · output {capture} + {transfer} ms · idle {ping} · HTTP {http} ms',
   'studio.faceDetected': 'Face detected',
   'studio.faceLostHold': 'No face · holding pose',
   'studio.faceLostNeutral': 'No face · waiting / back to neutral',
