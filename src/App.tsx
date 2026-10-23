@@ -208,6 +208,10 @@ const initialView = (): StudioView => ({
     transferMs: 0,
     pingMs: 0,
     httpPingMs: 0,
+    httpConnectMs: 0,
+    httpWaitMs: 0,
+    sendMs: 0,
+    readMs: 0,
   },
   virtualCamera: {
     supported: false,

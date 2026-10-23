@@ -81,6 +81,9 @@ impl Output {
                     tokio::time::sleep(Duration::from_millis(100)).await;
                     continue;
                 };
+                // Without this the socket coalesces small writes and waits for an ACK, which adds
+                // up to 40 ms to a request/response pair even on loopback.
+                let _ = socket.set_nodelay(true);
                 let Ok(permit) = slots.clone().try_acquire_owned() else {
                     continue;
                 };
@@ -181,7 +184,7 @@ async fn respond<B>(
     texture: &Arc<Mutex<texture::Output>>,
 ) -> Response<Full<Bytes>>
 where
-    B: hyper::body::Body,
+    B: hyper::body::Body + Unpin,
     B::Error: std::error::Error + Send + Sync + 'static,
 {
     let header = |name| {
@@ -211,20 +214,41 @@ where
         // A binary POST is not a simple request, so the browser sends a preflight first.
         (StatusCode::NO_CONTENT, "text/plain", Bytes::new())
     } else if method == hyper::Method::POST && path == "/frame" {
-        // A 1080p RGBA frame is 8.3 MB. Capping the stream keeps a local process from making the
-        // server buffer an unbounded body; `max_buf_size` only bounds hyper's read buffer.
+        // A 1080p RGBA frame is 8.3 MB. The browser always sends `Content-Length` for an
+        // `ArrayBuffer` body, so the declared size is checked first and `collect` can then reserve
+        // the buffer once; reading frame by frame costs an extra runtime hop per chunk (~70 ms on
+        // a 3.69 MB frame). Chunked uploads, which have no declared size, fall back to `Limited`.
         const MAX_FRAME: usize = 16 * 1024 * 1024;
-        let Ok(body) = Limited::new(request.into_body(), MAX_FRAME).collect().await else {
+        let body = request.into_body();
+        let declared = body.size_hint().upper();
+        if declared.is_some_and(|size| size as usize > MAX_FRAME) {
             return reply(StatusCode::PAYLOAD_TOO_LARGE, "text/plain", Bytes::new());
+        }
+        let read_start = Instant::now();
+        let bytes = if declared.is_some() {
+            match body.collect().await {
+                Ok(collected) => collected.to_bytes(),
+                Err(_) => return reply(StatusCode::BAD_REQUEST, "text/plain", Bytes::new()),
+            }
+        } else {
+            match Limited::new(body, MAX_FRAME).collect().await {
+                Ok(collected) => collected.to_bytes(),
+                Err(_) => return reply(StatusCode::PAYLOAD_TOO_LARGE, "text/plain", Bytes::new()),
+            }
         };
+        let read_ms = read_start.elapsed().as_millis() as u32;
         match texture.lock() {
-            Ok(output) => match output.submit(&body.to_bytes()) {
+            Ok(output) => match output.submit(&bytes) {
                 // The reply carries `wanted` so the front end keeps the receiver-aware polling it
                 // had over IPC (Syphon reports whether a client is attached).
-                Ok(wanted) => (
+                Ok((wanted, send_ms)) => (
                     StatusCode::OK,
                     "application/json",
-                    Bytes::from(format!("{{\"wanted\":{wanted}}}")),
+                    // `sendMs` covers the mutex wait plus the texture upload, so a slow frame can
+                    // be attributed to the sender rather than to transport.
+                    Bytes::from(format!(
+                        "{{\"wanted\":{wanted},\"sendMs\":{send_ms},\"readMs\":{read_ms}}}"
+                    )),
                 ),
                 Err(error) => (StatusCode::BAD_REQUEST, "text/plain", Bytes::from(error)),
             },
@@ -274,6 +298,9 @@ where
     {
         if let Ok(value) = hyper::header::HeaderValue::from_str(&origin) {
             let headers = response.headers_mut();
+            // Lets the app read the resource timing, which separates connection setup from the
+            // server's own latency when a round trip looks slow.
+            headers.insert("Timing-Allow-Origin", value.clone());
             headers.insert(hyper::header::ACCESS_CONTROL_ALLOW_ORIGIN, value);
             headers.insert(
                 hyper::header::ACCESS_CONTROL_ALLOW_METHODS,

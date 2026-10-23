@@ -1758,6 +1758,10 @@ export function createStudio(
             transfer: Math.round(obsOutput.state.transferMs),
             ping: obsOutput.state.pingMs,
             http: obsOutput.state.httpPingMs,
+            send: obsOutput.state.sendMs,
+            read: obsOutput.state.readMs,
+            connect: obsOutput.state.httpConnectMs,
+            wait: obsOutput.state.httpWaitMs,
           })
         : t('studio.renderStatus', {
             render: Math.round((frames * 1000) / (now - since)),

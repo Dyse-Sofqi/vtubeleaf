@@ -723,7 +723,7 @@ export default {
   'studio.phoneLeft': '手机已断开连接，扫描新的二维码即可重新配对。',
   'studio.renderStatus': '{render} FPS 渲染 · {input} FPS 输入 · {inference} ms 推理',
   'studio.renderStatusOutput':
-    '{render} FPS 渲染 · {input} FPS 输入 · {inference} ms 推理 · 输出 {capture} + {transfer} ms · 空载 {ping} · HTTP {http} ms',
+    '{render} FPS 渲染 · {input} FPS 输入 · {inference} ms 推理 · 输出 {capture} + {transfer} ms（读 {read} · 发 {send}） · 空载 {ping} · HTTP {http} ms（连 {connect} · 等 {wait}）',
   'studio.faceDetected': '已识别人脸',
   'studio.faceLostHold': '未识别人脸 · 保持姿态',
   'studio.faceLostNeutral': '未识别人脸 · 等待 / 回中立',

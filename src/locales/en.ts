@@ -807,7 +807,7 @@ export default {
   'studio.phoneLeft': 'The phone disconnected. Scan the new code to pair again.',
   'studio.renderStatus': '{render} FPS render · {input} FPS input · {inference} ms inference',
   'studio.renderStatusOutput':
-    '{render} FPS render · {input} FPS input · {inference} ms inference · output {capture} + {transfer} ms · idle {ping} · HTTP {http} ms',
+    '{render} FPS render · {input} FPS input · {inference} ms inference · output {capture} + {transfer} ms (read {read} · sender {send}) · idle {ping} · HTTP {http} ms (connect {connect} · wait {wait})',
   'studio.faceDetected': 'Face detected',
   'studio.faceLostHold': 'No face · holding pose',
   'studio.faceLostNeutral': 'No face · waiting / back to neutral',

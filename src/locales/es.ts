@@ -834,7 +834,7 @@ export default {
   'studio.phoneLeft': 'El teléfono se desconectó. Escanea el nuevo código para emparejar otra vez.',
   'studio.renderStatus': '{render} FPS render · {input} FPS entrada · {inference} ms inferencia',
   'studio.renderStatusOutput':
-    '{render} FPS render · {input} FPS entrada · {inference} ms inferencia · salida {capture} + {transfer} ms · inactivo {ping} · HTTP {http} ms',
+    '{render} FPS render · {input} FPS entrada · {inference} ms inferencia · salida {capture} + {transfer} ms (lectura {read} · envío {send}) · inactivo {ping} · HTTP {http} ms (conexión {connect} · espera {wait})',
   'studio.faceDetected': 'Cara detectada',
   'studio.faceLostHold': 'Sin cara · mantiene la postura',
   'studio.faceLostNeutral': 'Sin cara · espera / vuelve a neutro',

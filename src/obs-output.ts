@@ -32,10 +32,20 @@ export class ObsOutput {
     /** Empty round trips: the Tauri IPC channel and the local HTTP server, for comparison. */
     pingMs: 0,
     httpPingMs: 0,
+    /** The last HTTP round trip split into connection setup and time to first byte. */
+    httpConnectMs: 0,
+    httpWaitMs: 0,
+    /** The part of the last transfer spent inside the native sender (mutex + texture upload). */
+    sendMs: 0,
+    /** The part of the last transfer spent reading the request body on the server. */
+    readMs: 0,
   };
   private control: Promise<void> = Promise.resolve();
   /** Base URL of the local server that accepts native frames over `POST /frame`. */
   private nativeUrl = '';
+  /** Off-main-thread sender, so a frame upload never waits for a gap in the render loop. */
+  private worker?: Worker;
+  private frameId = 0;
   private frame?: Promise<void>;
   private running?: ObsMode;
   private revision = 0;
@@ -68,6 +78,9 @@ export class ObsOutput {
         const url = mode === 'native' ? '' : await invoke<string>('obs_start');
         if (mode === 'native') {
           this.nativeUrl = await invoke<string>('texture_start');
+          // Restart the worker so it picks up the URL of this session.
+          this.worker?.terminate();
+          this.worker = undefined;
           await this.measure();
         }
         this.running = mode;
@@ -100,13 +113,48 @@ export class ObsOutput {
       this.state.pingMs = 0;
     }
     try {
+      const url = new URL('frame', this.nativeUrl);
       const start = performance.now();
-      const response = await fetch(new URL('frame', this.nativeUrl), { cache: 'no-store' });
+      const response = await fetch(url, { cache: 'no-store' });
       // A rejected origin answers just as fast, so only a 2xx proves the channel works.
       this.state.httpPingMs = response.ok ? Math.round(performance.now() - start) : -1;
+      // Splits the round trip: a large `connect` means a new TCP connection every time, a large
+      // `wait` means the server or the main thread is the slow part.
+      const entry = performance.getEntriesByName(url.href).at(-1) as
+        | PerformanceResourceTiming
+        | undefined;
+      this.state.httpConnectMs = entry ? Math.round(entry.connectEnd - entry.connectStart) : 0;
+      this.state.httpWaitMs = entry ? Math.round(entry.responseStart - entry.requestStart) : 0;
     } catch {
       this.state.httpPingMs = 0;
     }
+  }
+
+  /** Lazily starts the frame worker and points it at the local server. */
+  private workerFor(): Worker {
+    if (!this.worker) {
+      this.worker = new Worker(new URL('./frame-worker.ts', import.meta.url), { type: 'module' });
+      this.worker.postMessage({
+        type: 'config',
+        url: new URL('frame', this.nativeUrl || 'http://127.0.0.1:18765/').href,
+      });
+    }
+    return this.worker;
+  }
+
+  /** Hands one frame to the worker and resolves with its reply, or `undefined` on failure. */
+  private sendInWorker(buffer: ArrayBuffer): Promise<{ ok: boolean; wanted?: boolean; sendMs?: number; readMs?: number } | undefined> {
+    const worker = this.workerFor();
+    const id = ++this.frameId;
+    return new Promise((resolve) => {
+      const handler = (event: MessageEvent) => {
+        if ((event.data as { id?: number }).id !== id) return;
+        worker.removeEventListener('message', handler);
+        resolve(event.data);
+      };
+      worker.addEventListener('message', handler);
+      worker.postMessage({ type: 'frame', id, buffer }, [buffer]);
+    });
   }
 
   submit(source: ObsFrameSource, width = NATIVE_WIDTH, height = NATIVE_HEIGHT): void {
@@ -134,19 +182,17 @@ export class ObsOutput {
         const pixels = source.transparentPixels(width, height);
         this.state.captureMs = performance.now() - captureStart;
         const start = performance.now();
-        // Local HTTP instead of `invoke`: the Tauri IPC channel costs a fixed ~96 ms per round
-        // trip here regardless of payload, while this path measured ~46 ms for a 720p frame.
-        try {
-          const response = await fetch(new URL('frame', this.nativeUrl), {
-            method: 'POST',
-            body: pixels.buffer as ArrayBuffer,
-            cache: 'no-store',
-          });
-          if (!response.ok) throw new Error(await response.text());
+        // The upload runs in a worker. On the main thread its response had to wait for a gap in
+        // the render loop, which cost ~39 ms even for an empty round trip and grew with frame rate.
+        // The buffer is copied because the worker takes ownership of what it is given.
+        const reply = await this.sendInWorker(pixels.slice().buffer);
+        if (reply?.ok) {
           // Syphon reports whether a client is attached; keeping that avoids rendering frames
           // nobody reads on macOS.
-          this.wanted = ((await response.json()) as { wanted: boolean }).wanted;
-        } catch {
+          this.wanted = reply.wanted ?? true;
+          this.state.sendMs = reply.sendMs ?? 0;
+          this.state.readMs = reply.readMs ?? 0;
+        } else {
           // Fall back to IPC so a server that failed to bind cannot stop the output outright.
           this.wanted = await invoke<boolean>('texture_submit', pixels);
         }

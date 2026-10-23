@@ -1,6 +1,7 @@
 //! Shares transparent frames with OBS through Syphon (macOS) or Spout2 (Windows).
 use crate::locale;
 use std::sync::{Arc, Mutex};
+use std::time::Instant;
 use tauri::{ipc::InvokeBody, State, WebviewWindow};
 
 /// Frame sizes the sender accepts. The front end picks one with the "OBS output size" setting;
@@ -83,7 +84,7 @@ impl Output {
         false
     }
 
-    pub fn submit(&self, bytes: &[u8]) -> Result<bool, String> {
+    pub fn submit(&self, bytes: &[u8]) -> Result<(bool, u32), String> {
         let Some((width, height)) = FRAME_SIZES
             .into_iter()
             .find(|(w, h)| bytes.len() == (*w as usize) * (*h as usize) * 4)
@@ -98,8 +99,9 @@ impl Output {
             .into());
         };
         let Some(sender) = &self.0 else {
-            return Ok(false);
+            return Ok((false, 0));
         };
+        let started = Instant::now();
         #[cfg(any(target_os = "macos", target_os = "windows"))]
         if unsafe { vtubeleaf_texture_send(sender.0, bytes.as_ptr(), width, height) } != 0 {
             return Err(locale::text([
@@ -111,8 +113,9 @@ impl Output {
             ])
             .into());
         }
+        let send_ms = started.elapsed().as_millis() as u32;
         let _ = sender;
-        Ok(self.wanted())
+        Ok((self.wanted(), send_ms))
     }
 }
 
@@ -183,10 +186,11 @@ pub fn texture_submit(
         ])
         .into());
     };
-    output
+    let (wanted, _) = output
         .lock()
         .map_err(|_| locale::text(OUTPUT_UNAVAILABLE))?
-        .submit(bytes)
+        .submit(bytes)?;
+    Ok(wanted)
 }
 
 /// Round-trips a raw body without touching the sender, so the status bar can show what the IPC
@@ -219,7 +223,7 @@ mod tests {
         let mut output = Output::default();
         assert!(output.submit(&[0; 16]).is_err());
         let frame = vec![0; 1920 * 1080 * 4];
-        assert!(!output.submit(&frame).unwrap());
+        assert!(!output.submit(&frame).unwrap().0);
         assert!(!output.wanted());
         #[cfg(any(target_os = "macos", target_os = "windows"))]
         {
@@ -227,14 +231,14 @@ mod tests {
             output.start().unwrap();
             // No Syphon client is attached in tests; Spout2 always asks for frames.
             assert_eq!(
-                output.submit(&frame).unwrap(),
+                output.submit(&frame).unwrap().0,
                 cfg!(target_os = "windows")
             );
             // The 720p size is accepted too, so the front end can switch without a restart.
             assert!(output.submit(&vec![0; 1280 * 720 * 4]).is_ok());
             output.stop();
             output.stop();
-            assert!(!output.submit(&frame).unwrap());
+            assert!(!output.submit(&frame).unwrap().0);
         }
     }
 }

@@ -829,7 +829,7 @@ export default {
     'スマートフォンが切断しました。新しい QR コードをスキャンすると再度ペアリングできます。',
   'studio.renderStatus': '描画 {render} FPS · 入力 {input} FPS · 推論 {inference} ms',
   'studio.renderStatusOutput':
-    '描画 {render} FPS · 入力 {input} FPS · 推論 {inference} ms · 出力 {capture} + {transfer} ms · 待機 {ping} · HTTP {http} ms',
+    '描画 {render} FPS · 入力 {input} FPS · 推論 {inference} ms · 出力 {capture} + {transfer} ms（読込 {read} · 送信 {send}） · 待機 {ping} · HTTP {http} ms（接続 {connect} · 待ち {wait}）',
   'studio.faceDetected': '顔を認識中',
   'studio.faceLostHold': '顔未検出 · 姿勢を保持',
   'studio.faceLostNeutral': '顔未検出 · 待機 / ニュートラルへ',
