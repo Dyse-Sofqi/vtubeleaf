@@ -635,7 +635,7 @@ export default {
   'studio.restartBusy':
     'Se está cargando un avatar o una escena. Vuelve a reiniciar en un momento.',
   'app.trackingDelegate': 'Procesador de seguimiento',
-  'app.trackingDelegateGpu': 'GPU · Predeterminado',
+  'app.trackingDelegateGpu': 'GPU',
   'app.trackingDelegateHint':
     'Solo afecta a la detección facial. Cambia a CPU si la GPU es inestable.',
   'tracker.gpuFailed':
@@ -834,7 +834,7 @@ export default {
   'studio.phoneLeft': 'El teléfono se desconectó. Escanea el nuevo código para emparejar otra vez.',
   'studio.renderStatus': '{render} FPS render · {input} FPS entrada · {inference} ms inferencia',
   'studio.renderStatusOutput':
-    '{render} FPS render · {input} FPS entrada · {inference} ms inferencia · salida {capture} + {transfer} ms (lectura {read} · envío {send}) · inactivo {ping} · HTTP {http} ms (conexión {connect} · espera {wait})',
+    '{render} FPS render · {input} FPS entrada · {inference} ms inferencia · salida {sent} FPS · {capture} + {transfer} ms (lectura {read} · envío {send}) · inactivo {ping} · HTTP {http} ms (conexión {connect} · espera {wait})',
   'studio.faceDetected': 'Cara detectada',
   'studio.faceLostHold': 'Sin cara · mantiene la postura',
   'studio.faceLostNeutral': 'Sin cara · espera / vuelve a neutro',

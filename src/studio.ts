@@ -1754,6 +1754,7 @@ export function createStudio(
             render: Math.round((frames * 1000) / (now - since)),
             input: inputFps,
             inference: tracker.inferenceMs.toFixed(0),
+            sent: obsOutput.state.sentFps,
             capture: Math.round(obsOutput.state.captureMs),
             transfer: Math.round(obsOutput.state.transferMs),
             ping: obsOutput.state.pingMs,

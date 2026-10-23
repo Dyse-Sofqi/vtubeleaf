@@ -575,7 +575,7 @@ export default {
   'studio.restartUnsavedRecording': '有未保存的动作录制，请先在角色控制中保存，再重启应用。',
   'studio.restartBusy': '正在加载角色或场景，请稍后再重启。',
   'app.trackingDelegate': '面捕计算设备',
-  'app.trackingDelegateGpu': 'GPU · 默认',
+  'app.trackingDelegateGpu': 'GPU',
   'app.trackingDelegateHint': '仅影响面部识别；GPU 运行不稳定时可切换为 CPU。',
   'tracker.gpuFailed':
     '面捕启动失败。请在「跟踪引擎与采集」中将「面捕计算设备」切换为 CPU 后重试；若仍失败，请检查本地面捕资源。',
@@ -723,7 +723,7 @@ export default {
   'studio.phoneLeft': '手机已断开连接，扫描新的二维码即可重新配对。',
   'studio.renderStatus': '{render} FPS 渲染 · {input} FPS 输入 · {inference} ms 推理',
   'studio.renderStatusOutput':
-    '{render} FPS 渲染 · {input} FPS 输入 · {inference} ms 推理 · 输出 {capture} + {transfer} ms（读 {read} · 发 {send}） · 空载 {ping} · HTTP {http} ms（连 {connect} · 等 {wait}）',
+    '{render} FPS 渲染 · {input} FPS 输入 · {inference} ms 推理 · 输出 {sent} FPS · {capture} + {transfer} ms（读 {read} · 发 {send}） · 空载 {ping} · HTTP {http} ms（连 {connect} · 等 {wait}）',
   'studio.faceDetected': '已识别人脸',
   'studio.faceLostHold': '未识别人脸 · 保持姿态',
   'studio.faceLostNeutral': '未识别人脸 · 等待 / 回中立',

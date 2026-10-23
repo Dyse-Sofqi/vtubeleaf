@@ -11,6 +11,7 @@
 
 ### Improved
 
+- "Tracking engine" now applies your "Compute device" choice to upper-body and hand tracking too; before, those two always ran on the CPU even when the GPU was selected.
 - "OBS transparent output" and the "Output window" run smoother: frames now reach OBS over a local connection instead of the app's internal channel (about 96 ms less waiting per frame), the output no longer waits for the preview to finish drawing, and neither redraws at twice the resolution for a sharpness gain that mostly cost frame rate.
 - The release notes shown after an update now use a wider dialog, so longer entries are easier to read.
 - The main window can no longer be resized below 1280×720, leaving enough room for the stage and settings.

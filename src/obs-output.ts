@@ -39,6 +39,8 @@ export class ObsOutput {
     sendMs: 0,
     /** The part of the last transfer spent reading the request body on the server. */
     readMs: 0,
+    /** Frames actually delivered to OBS per second, which a slow round trip caps. */
+    sentFps: 0,
   };
   private control: Promise<void> = Promise.resolve();
   /** Base URL of the local server that accepts native frames over `POST /frame`. */
@@ -46,6 +48,10 @@ export class ObsOutput {
   /** Off-main-thread sender, so a frame upload never waits for a gap in the render loop. */
   private worker?: Worker;
   private frameId = 0;
+  private sent = 0;
+  private sentSince = performance.now();
+  /** Frames handed to the worker and not yet answered; two keep the pipe busy without piling up. */
+  private inFlight = 0;
   private frame?: Promise<void>;
   private running?: ObsMode;
   private revision = 0;
@@ -166,7 +172,11 @@ export class ObsOutput {
     if (
       !this.state.active ||
       this.state.pending ||
-      this.frame ||
+      // A single in-flight frame serialised submissions: when the round trip was longer than the
+      // frame interval, every second frame was skipped and the output halved (30 FPS rendered,
+      // 15 FPS delivered). Two frames overlap instead, which keeps the pipe full at one frame of
+      // extra latency.
+      this.inFlight >= 2 ||
       now - this.lastFrame < (idle ? 250 : native ? 0 : 1000 / 30 - 4)
     )
       return;
@@ -185,7 +195,10 @@ export class ObsOutput {
         // The upload runs in a worker. On the main thread its response had to wait for a gap in
         // the render loop, which cost ~39 ms even for an empty round trip and grew with frame rate.
         // The buffer is copied because the worker takes ownership of what it is given.
-        const reply = await this.sendInWorker(pixels.slice().buffer);
+        this.inFlight++;
+        const reply = await this.sendInWorker(pixels.slice().buffer).finally(() => {
+          this.inFlight--;
+        });
         if (reply?.ok) {
           // Syphon reports whether a client is attached; keeping that avoids rendering frames
           // nobody reads on macOS.
@@ -197,6 +210,14 @@ export class ObsOutput {
           this.wanted = await invoke<boolean>('texture_submit', pixels);
         }
         this.state.transferMs = performance.now() - start;
+        // A slow round trip serialises submissions, so report what OBS really receives.
+        this.sent++;
+        const now = performance.now();
+        if (now - this.sentSince >= 1000) {
+          this.state.sentFps = Math.round((this.sent * 1000) / (now - this.sentSince));
+          this.sent = 0;
+          this.sentSince = now;
+        }
         return;
       }
       // ponytail: PNG readback/encoding caps throughput; the native mode avoids it.

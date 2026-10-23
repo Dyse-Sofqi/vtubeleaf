@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { gpuName } from './gpu';
 import { flushSync } from 'react-dom';
 import { AlertDialog, ContextMenu, Dialog, DropdownMenu, Tabs, ToggleGroup } from 'radix-ui';
 import {
@@ -212,6 +213,7 @@ const initialView = (): StudioView => ({
     httpWaitMs: 0,
     sendMs: 0,
     readMs: 0,
+    sentFps: 0,
   },
   virtualCamera: {
     supported: false,
@@ -366,6 +368,8 @@ export function App() {
       onChange={(value) => set(key, value)}
     />
   );
+  // The browser reports the adapter MediaPipe will use, which is what this option selects.
+  const gpu = useMemo(() => gpuName(), []);
   const toggle = (key: keyof Settings, label: string, disabled = false) => (
     <Toggle
       id={key}
@@ -1201,7 +1205,9 @@ export function App() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="GPU">{t('app.trackingDelegateGpu')}</SelectItem>
+                    <SelectItem value="GPU">
+                      {gpu ? `${t('app.trackingDelegateGpu')} · ${gpu}` : t('app.trackingDelegateGpu')}
+                    </SelectItem>
                     <SelectItem value="CPU">CPU</SelectItem>
                   </SelectContent>
                 </Select>
